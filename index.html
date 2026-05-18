@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BLUNT — Market Opportunity Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #060A10;
+    --bg2:      #0C1219;
+    --bg3:      #131B25;
+    --red:      #00C2FF;
+    --red-dim:  rgba(0,194,255,0.08);
+    --red-mid:  rgba(0,194,255,0.22);
+    --yellow:   #7EFFD4;
+    --cream:    #E8F0F5;
+    --cream60:  rgba(232,240,245,0.6);
+    --cream30:  rgba(232,240,245,0.3);
+    --border:   rgba(255,255,255,0.07);
+    --border2:  rgba(255,255,255,0.11);
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2.5rem;
+    background: rgba(6,10,16,0.76);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.12em;
+    color: var(--cream);
+  }
+  nav .logo span { color: var(--red); }
+  nav .verdict-pill {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--red);
+    background: var(--red-dim);
+    border: 1px solid var(--red-mid);
+    padding: 0.3rem 0.9rem;
+    border-radius: 2px;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2.5rem;
+    padding-top: 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,194,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,194,255,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  }
+  .hero-glow {
+    position: absolute;
+    bottom: -10%; right: -5%;
+    width: 55vw; height: 55vw;
+    background: radial-gradient(circle, rgba(0,194,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-glow2 {
+    position: absolute;
+    top: 10%; left: -8%;
+    width: 35vw; height: 35vw;
+    background: radial-gradient(circle, rgba(126,255,212,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-can {
+    position: absolute;
+    right: 4vw;
+    bottom: 0;
+    height: 82vh;
+    max-height: 720px;
+    min-height: 320px;
+    object-fit: contain;
+    z-index: 1;
+    filter: drop-shadow(0 0 60px rgba(0,194,255,0.18)) drop-shadow(0 40px 80px rgba(0,0,0,0.6));
+    pointer-events: none;
+    user-select: none;
+  }
+  @media (max-width: 900px) {
+    .hero-can { height: 45vh; right: -2vw; opacity: 0.35; }
+  }
+
+  .hero-content { position: relative; z-index: 2; max-width: 580px; }
+
+  .hero-label {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    color: var(--red);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--red);
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 14vw, 10rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+  }
+  .hero-title .accent { color: var(--red); }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--cream60);
+    max-width: 520px;
+    margin-bottom: 3rem;
+    font-weight: 300;
+  }
+
+  .score-display {
+    display: flex;
+    align-items: flex-end;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .big-score {
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 12vw, 8rem);
+    line-height: 1;
+    color: var(--yellow);
+    text-shadow: 0 0 60px rgba(126,255,212,0.35);
+  }
+  .big-score sub {
+    font-size: 2.5rem;
+    color: var(--cream30);
+    vertical-align: baseline;
+    font-family: var(--font-display);
+  }
+  .score-meta {
+    padding-bottom: 0.8rem;
+  }
+  .score-meta .label {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    color: var(--cream30);
+    margin-bottom: 0.3rem;
+  }
+  .score-meta .verdict {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 0.08em;
+    color: var(--red);
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem; right: 2.5rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--cream30);
+    writing-mode: vertical-rl;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .scroll-hint::after {
+    content: '';
+    width: 1px;
+    height: 40px;
+    background: var(--border2);
+    display: block;
+  }
+
+  /* SECTIONS */
+  section { padding: 6rem 2.5rem; }
+  section:nth-child(odd) { background: var(--bg); }
+  section:nth-child(even) { background: var(--bg2); }
+
+  .section-label {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--red);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .section-label::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--red);
+    display: inline-block;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    color: var(--cream);
+    margin-bottom: 3rem;
+  }
+
+  /* MARKET SIZE */
+  .tam-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+  .tam-cell {
+    background: var(--bg2);
+    padding: 2.2rem 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+  .tam-cell:hover { background: var(--bg3); }
+  .tam-cell .cell-label {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--cream30);
+    margin-bottom: 0.8rem;
+  }
+  .tam-cell .cell-value {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    color: var(--cream);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .tam-cell .cell-value span { color: var(--yellow); }
+  .tam-cell .cell-desc {
+    font-size: 0.82rem;
+    color: var(--cream60);
+    font-weight: 300;
+  }
+  .tam-cell::before {
+    content: attr(data-num);
+    position: absolute;
+    top: 1rem; right: 1.2rem;
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+  }
+
+  .trend-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: var(--red-dim);
+    border: 1px solid var(--red-mid);
+  }
+  .trend-bar .trend-icon { color: var(--red); font-size: 1.2rem; }
+  .trend-bar p { font-size: 0.9rem; color: var(--cream60); }
+  .trend-bar p strong { color: var(--cream); font-weight: 500; }
+
+  /* COMPETITION */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+  }
+  .comp-table th {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--cream30);
+    text-align: left;
+    padding: 0.8rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .comp-table td {
+    padding: 1.2rem;
+    font-size: 0.88rem;
+    color: var(--cream60);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .comp-table tr:hover td { background: var(--bg3); color: var(--cream); }
+  .comp-table td:first-child { color: var(--cream); font-weight: 500; }
+  .gap-highlight td { background: rgba(0,194,255,0.05); }
+  .gap-highlight td:first-child { color: var(--red); }
+
+  .gap-box {
+    padding: 1.8rem 2rem;
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    margin-top: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .gap-box::before {
+    content: 'GAP';
+    position: absolute;
+    top: -0.5rem; right: 1rem;
+    font-family: var(--font-display);
+    font-size: 5rem;
+    color: rgba(255,255,255,0.02);
+    line-height: 1;
+  }
+  .gap-box p { font-size: 0.9rem; color: var(--cream60); }
+  .gap-box p strong { color: var(--cream); font-weight: 500; }
+
+  /* SCORE CARDS */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .score-card {
+    background: var(--bg);
+    padding: 2rem;
+    transition: background 0.2s;
+    position: relative;
+  }
+  .score-card:hover { background: var(--bg3); }
+  .score-card .card-name {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--cream30);
+    margin-bottom: 0.8rem;
+  }
+  .score-card .card-score {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 0.6rem;
+  }
+  .score-card .card-desc {
+    font-size: 0.82rem;
+    color: var(--cream60);
+  }
+  .bar-wrap {
+    height: 3px;
+    background: var(--border);
+    margin-top: 1.2rem;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--red);
+    border-radius: 1px;
+    transition: width 1s ease;
+  }
+  .bar-fill.yellow { background: var(--yellow); }
+
+  /* VIRALITY */
+  .virality-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .v-card {
+    border: 1px solid var(--border);
+    padding: 1.6rem 1.4rem;
+    background: var(--bg2);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .v-card:hover { border-color: var(--red-mid); background: var(--bg3); }
+  .v-card .v-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--cream30);
+    margin-bottom: 0.5rem;
+  }
+  .v-card .v-score {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    margin-bottom: 0.3rem;
+  }
+  .v-card .v-note { font-size: 0.78rem; color: var(--cream60); }
+
+  /* RISKS */
+  .risk-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .risk-item {
+    background: var(--bg2);
+    padding: 1.8rem 2rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    transition: background 0.2s;
+  }
+  .risk-item:hover { background: var(--bg3); }
+  .risk-num {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--red);
+    line-height: 1;
+    opacity: 0.5;
+  }
+  .risk-body h4 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+  }
+  .risk-body p { font-size: 0.85rem; color: var(--cream60); }
+  .risk-body .mitigation {
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .risk-body .mitigation::before {
+    content: '→';
+    font-family: var(--font-display);
+  }
+
+  /* MONЕТIZATION */
+  .mono-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .mono-cell {
+    background: var(--bg);
+    padding: 2rem;
+    transition: background 0.2s;
+  }
+  .mono-cell:hover { background: var(--bg3); }
+  .mono-cell .mono-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--cream30);
+    margin-bottom: 0.6rem;
+  }
+  .mono-cell .mono-value {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--yellow);
+    margin-bottom: 0.4rem;
+  }
+  .mono-cell .mono-note { font-size: 0.82rem; color: var(--cream60); }
+
+  /* RECOMMENDATION */
+  .rec-section {
+    background: var(--red) !important;
+    padding: 6rem 2.5rem;
+  }
+  .rec-section .section-label { color: rgba(0,12,24,0.55); }
+  .rec-section .section-label::before { background: rgba(0,12,24,0.35); }
+  .rec-section .section-title { color: #001824; }
+  .rec-verdict {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 10vw, 8rem);
+    line-height: 0.9;
+    color: #001824;
+    margin-bottom: 3rem;
+  }
+  .rec-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: rgba(0,12,24,0.18);
+    border: 1px solid rgba(0,12,24,0.18);
+  }
+  .rec-card {
+    background: rgba(0,12,24,0.12);
+    padding: 2rem;
+    transition: background 0.2s;
+  }
+  .rec-card:hover { background: rgba(0,12,24,0.24); }
+  .rec-card .rc-label {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: rgba(0,12,24,0.5);
+    margin-bottom: 0.6rem;
+  }
+  .rec-card p { font-size: 0.88rem; color: rgba(0,12,24,0.8); line-height: 1.6; }
+  .rec-card p strong { color: #001824; font-weight: 500; }
+
+  /* SPECTRUM BAR (score breakdown) */
+  .spectrum {
+    height: 6px;
+    background: linear-gradient(90deg, #1a2030, var(--red) 50%, var(--yellow) 100%);
+    border-radius: 2px;
+    margin: 3rem 0 1rem;
+    position: relative;
+  }
+  .spectrum-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px; height: 14px;
+    background: var(--cream);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--red);
+  }
+  .spectrum-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--cream30);
+  }
+
+  /* WEIGHTS TABLE */
+  .weights {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+  }
+  .weight-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 0;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    align-items: center;
+  }
+  .weight-row:last-child { border-bottom: none; }
+  .weight-row:hover { background: var(--bg3); }
+  .weight-row .w-name { font-size: 0.88rem; color: var(--cream60); }
+  .weight-row .w-weight {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--cream30);
+  }
+  .weight-row .w-score {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--yellow);
+    text-align: right;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 3rem 2.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  footer .footer-brand {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: 0.15em;
+    color: var(--cream30);
+  }
+  footer .footer-brand span { color: var(--red); }
+  footer p { font-size: 0.75rem; color: var(--cream30); }
+
+  /* REVEAL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 700px) {
+    nav { padding: 1rem 1.25rem; }
+    section, .hero, .rec-section, footer { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .tam-grid, .mono-grid { grid-template-columns: 1fr; }
+    .comp-table { font-size: 0.8rem; }
+    .score-display { gap: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">BLUNT<span>.</span></div>
+  <div class="verdict-pill">GO WITH ANGLE</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <img class="hero-can" src="blunt-can.png" alt="BLUNT can" />
+  <div class="hero-content">
+    <div class="hero-label">Market Opportunity Analysis</div>
+    <h1 class="hero-title">RTD<br>Creatine<br><span class="accent">Europe</span></h1>
+    <p class="hero-sub">Creatine + electrolytes in a can — targeting active Europeans who don't identify as gym culture but live performance-oriented lives.</p>
+    <div class="score-display">
+      <div class="big-score">7.8<sub>/10</sub></div>
+      <div class="score-meta">
+        <div class="label">Opportunity Verdict</div>
+        <div class="verdict">Strong → Go</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll</div>
+</div>
+
+<!-- MARKET SIZE -->
+<section id="market">
+  <div class="section-label">01</div>
+  <h2 class="section-title reveal">Market<br>Size</h2>
+  <div class="tam-grid reveal">
+    <div class="tam-cell" data-num="01">
+      <div class="cell-label">TAM — Total Addressable</div>
+      <div class="cell-value"><span>180M</span></div>
+      <div class="cell-desc">European adults 25–45 who are active and health-aware</div>
+    </div>
+    <div class="tam-cell" data-num="02">
+      <div class="cell-label">SAM — Serviceable</div>
+      <div class="cell-value"><span>22M</span></div>
+      <div class="cell-desc">Padel / cycling / running crowd in Western Europe, ingredient-literate premium spenders</div>
+    </div>
+    <div class="tam-cell" data-num="03">
+      <div class="cell-label">SOM — Realistic 3-Year</div>
+      <div class="cell-value"><span>400K</span></div>
+      <div class="cell-desc">Capturable via DTC + gym channel + 1–2 retail chains</div>
+    </div>
+  </div>
+  <div class="trend-bar reveal">
+    <div class="trend-icon">↑</div>
+    <p><strong>Growing fast.</strong> European creatine market $217M → $779M by 2033 (15%+ CAGR). RTD creatine is pre-wave in Europe — 18–24 months behind the US curve. Functional RTD growing ~8% CAGR in parallel.</p>
+  </div>
+</section>
+
+<!-- COMPETITION -->
+<section id="competition">
+  <div class="section-label">02</div>
+  <h2 class="section-title reveal">Competition<br>Landscape</h2>
+  <table class="comp-table reveal">
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Format</th>
+        <th>Gap</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Momentous / Gainful (US)</td>
+        <td>Powder, DTC</td>
+        <td>No European RTD presence</td>
+      </tr>
+      <tr>
+        <td>Nocco (Europe)</td>
+        <td>RTD but BCAA/caffeine</td>
+        <td>Gym-bro aesthetic, no creatine</td>
+      </tr>
+      <tr>
+        <td>Huel</td>
+        <td>Powder / meal replacement</td>
+        <td>Different use case entirely</td>
+      </tr>
+      <tr>
+        <td>Athletic Brewing</td>
+        <td>RTD non-alcoholic beer</td>
+        <td>Same consumer, different category</td>
+      </tr>
+      <tr>
+        <td>Olipop / Remedy</td>
+        <td>Gut health RTD</td>
+        <td>Same aesthetic, different function</td>
+      </tr>
+      <tr class="gap-highlight">
+        <td>BLUNT</td>
+        <td>RTD Creatine + Electrolytes</td>
+        <td>Unoccupied — zero direct European competitor</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="gap-box reveal">
+    <p><strong>Saturation: Low</strong> in European RTD creatine / Medium in functional beverages broadly. The "postable, desk-worthy" lifestyle positioning combined with creatine + electrolytes in a can is <strong>genuinely unoccupied territory</strong>.</p>
+  </div>
+</section>
+
+<!-- SCORE BREAKDOWN -->
+<section id="scores">
+  <div class="section-label">03</div>
+  <h2 class="section-title reveal">Dimension<br>Scores</h2>
+  <div class="score-grid reveal">
+    <div class="score-card">
+      <div class="card-name">Market Size</div>
+      <div class="card-score" style="color:var(--yellow)">8<span style="font-size:1.2rem;color:var(--cream30)">/10</span></div>
+      <div class="card-desc">Large TAM, genuinely underserved SAM in the European RTD creatine space.</div>
+      <div class="bar-wrap"><div class="bar-fill yellow" style="width:80%"></div></div>
+    </div>
+    <div class="score-card">
+      <div class="card-name">Recreatability / Organic Growth</div>
+      <div class="card-score" style="color:var(--cream)">7<span style="font-size:1.2rem;color:var(--cream30)">/10</span></div>
+      <div class="card-desc">Design-dependent but ceiling is high. If the can is photogenic, UGC is essentially free.</div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:70%"></div></div>
+    </div>
+    <div class="score-card">
+      <div class="card-name">Monetization</div>
+      <div class="card-score" style="color:var(--yellow)">8<span style="font-size:1.2rem;color:var(--cream30)">/10</span></div>
+      <div class="card-desc">Strong unit economics with subscription layer. 55–60% gross margin DTC.</div>
+      <div class="bar-wrap"><div class="bar-fill yellow" style="width:80%"></div></div>
+    </div>
+    <div class="score-card">
+      <div class="card-name">Virality</div>
+      <div class="card-score" style="color:var(--cream)">8<span style="font-size:1.2rem;color:var(--cream30)">/10</span></div>
+      <div class="card-desc">Tight community networks — padel clubs, CrossFit, cycling. One person brings it, it spreads.</div>
+      <div class="bar-wrap"><div class="bar-fill" style="width:80%"></div></div>
+    </div>
+    <div class="score-card">
+      <div class="card-name">Competition Gap</div>
+      <div class="card-score" style="color:var(--yellow)">9<span style="font-size:1.2rem;color:var(--cream30)">/10</span></div>
+      <div class="card-desc">Genuine white space in Europe. First-mover advantage is real and time-limited.</div>
+      <div class="bar-wrap"><div class="bar-fill yellow" style="width:90%"></div></div>
+    </div>
+  </div>
+
+  <div class="weights reveal">
+    <div class="weight-row">
+      <div class="w-name">Market Size (25%)</div>
+      <div class="w-weight">25%</div>
+      <div class="w-score">8</div>
+    </div>
+    <div class="weight-row">
+      <div class="w-name">Recreatability / Organic Growth (25%)</div>
+      <div class="w-weight">25%</div>
+      <div class="w-score">7</div>
+    </div>
+    <div class="weight-row">
+      <div class="w-name">Monetization (20%)</div>
+      <div class="w-weight">20%</div>
+      <div class="w-score">8</div>
+    </div>
+    <div class="weight-row">
+      <div class="w-name">Virality (20%)</div>
+      <div class="w-weight">20%</div>
+      <div class="w-score">8</div>
+    </div>
+    <div class="weight-row">
+      <div class="w-name">Competition Gap (10%)</div>
+      <div class="w-weight">10%</div>
+      <div class="w-score">9</div>
+    </div>
+  </div>
+
+  <div class="spectrum reveal">
+    <div class="spectrum-marker" style="left:78%"></div>
+  </div>
+  <div class="spectrum-labels reveal">
+    <span>Skip</span>
+    <span>Moderate</span>
+    <span>Strong</span>
+    <span>Massive</span>
+  </div>
+</section>
+
+<!-- VIRALITY -->
+<section id="virality">
+  <div class="section-label">04</div>
+  <h2 class="section-title reveal">Virality<br>Factors</h2>
+  <div class="virality-grid reveal">
+    <div class="v-card">
+      <div class="v-label">Hook Strength</div>
+      <div class="v-score" style="color:var(--yellow)">8/10</div>
+      <div class="v-note">"Creatine in a can" is a single-sentence pitch anyone instantly gets.</div>
+    </div>
+    <div class="v-card">
+      <div class="v-label">Shareability</div>
+      <div class="v-score" style="color:var(--cream)">7/10</div>
+      <div class="v-note">Design-literate audience shares aesthetically pleasing products.</div>
+    </div>
+    <div class="v-card">
+      <div class="v-label">Save / Rewatch</div>
+      <div class="v-score" style="color:var(--cream)">5/10</div>
+      <div class="v-note">Educational "why creatine?" content saves well across platforms.</div>
+    </div>
+    <div class="v-card">
+      <div class="v-label">Algorithm Fit</div>
+      <div class="v-score" style="color:var(--cream)">7/10</div>
+      <div class="v-note">Lifestyle + wellness is a strong IG / TikTok category with high engagement rates.</div>
+    </div>
+    <div class="v-card">
+      <div class="v-label">Word of Mouth</div>
+      <div class="v-score" style="color:var(--yellow)">9/10</div>
+      <div class="v-note">Padel clubs, CrossFit boxes, cycling groups are tight social networks. One person brings it, it spreads.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MONETIZATION -->
+<section id="monetization">
+  <div class="section-label">05</div>
+  <h2 class="section-title reveal">Monetization<br>Potential</h2>
+  <div class="mono-grid reveal">
+    <div class="mono-cell">
+      <div class="mono-label">DTC Gross Margin</div>
+      <div class="mono-value">55–60%</div>
+      <div class="mono-note">COGS ~€1.20–1.60/can at scale. Retail price €3.50–4.50.</div>
+    </div>
+    <div class="mono-cell">
+      <div class="mono-label">Subscription LTV</div>
+      <div class="mono-value">€400–600</div>
+      <div class="mono-note">€40–50/month box, 12-month retention target. Powder phase.</div>
+    </div>
+    <div class="mono-cell">
+      <div class="mono-label">Revenue at 10K Subscribers</div>
+      <div class="mono-value">€400–500K</div>
+      <div class="mono-note">Annual recurring revenue before retail kicks in. Breakeven likely at 3–5K subs.</div>
+    </div>
+    <div class="mono-cell">
+      <div class="mono-label">Sponsorship Fit</div>
+      <div class="mono-value">Strong</div>
+      <div class="mono-note">On Running, Lululemon, Whoop — direct co-marketing potential. Padel tournaments, cycling events.</div>
+    </div>
+  </div>
+</section>
+
+<!-- RISKS -->
+<section id="risks">
+  <div class="section-label">06</div>
+  <h2 class="section-title reveal">Risk<br>Factors</h2>
+  <div class="risk-list reveal">
+    <div class="risk-item">
+      <div class="risk-num">01</div>
+      <div class="risk-body">
+        <h4>CreaBev® Supplier Dependency</h4>
+        <p>You're reliant on a single encapsulation technology supplier. If they can't scale or pricing increases, the core product differentiator is threatened.</p>
+        <div class="mitigation">Validate alternative encapsulation options early. Negotiate exclusivity.</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div class="risk-num">02</div>
+      <div class="risk-body">
+        <h4>18-Month Copycat Window</h4>
+        <p>If BLUNT validates the market with a DTC launch, a Nocco, Huel, or Redbull-backed competitor can launch a me-too with 10× the budget. Speed and brand equity are your only moat.</p>
+        <div class="mitigation">Move fast. Build community before retail. Make brand equity defensible.</div>
+      </div>
+    </div>
+    <div class="risk-item">
+      <div class="risk-num">03</div>
+      <div class="risk-body">
+        <h4>Retail Timeline Slippage</h4>
+        <p>Independent health stores (Ekoplaza, etc.) have long lead times and listing fees. Phase 3 likely slips to 24–30 months realistically.</p>
+        <div class="mitigation">Plan cash for a longer powder-first runway. Don't underestimate retail gatekeeping.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECOMMENDATION -->
+<section class="rec-section" id="recommendation">
+  <div class="section-label">07</div>
+  <h2 class="section-title">Recommendation</h2>
+  <div class="rec-verdict">GO —<br>Copenhagen<br>First.</div>
+  <div class="rec-cards">
+    <div class="rec-card">
+      <div class="rc-label">The Angle</div>
+      <p>Own <strong>"creatine for people who don't take supplements."</strong> Not gym. Not sport. Not biohacking. Everyday performance for people who care how they feel at 3pm. The cognitive / afternoon energy angle sidesteps the bodybuilder association entirely.</p>
+    </div>
+    <div class="rec-card">
+      <div class="rc-label">First 30 Days</div>
+      <p><strong>Lock CreaBev® or equivalent with an exclusivity clause.</strong> Design the can before you make the can — the visual identity IS the product validation. Launch a waitlist targeting Copenhagen padel clubs and cycling communities. Get 5 micro-influencers to post about "what they wish existed."</p>
+    </div>
+    <div class="rec-card">
+      <div class="rc-label">Channel to Study</div>
+      <p><strong>Momentous</strong> — US brand that crossed from elite sport into mainstream with exactly this positioning shift. Their content, ambassador strategy, and DTC-to-retail sequencing is your playbook. Athletic Brewing for cultural proof of concept.</p>
+    </div>
+    <div class="rec-card">
+      <div class="rc-label">Bottom Line</div>
+      <p>The concept is sound, the timing is right, the positioning is differentiated. <strong>The risk isn't the idea — it's execution speed</strong> and staying funded through the 18-month powder → can transition. If the can looks as good as Olipop and the community is tight before retail, this is a real brand.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">BLUNT<span>.</span></div>
+  <p>Market Opportunity Analysis — Confidential</p>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
