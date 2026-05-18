@@ -1,7 +1,8 @@
 "use client";
 import { motion, useScroll, useTransform } from "framer-motion";
-import Image from "next/image";
+import Can3D from "./Can3D";
 import { useRef } from "react";
+import React from "react";
 
 const stagger = {
   hidden: {},
@@ -54,27 +55,17 @@ export default function Hero() {
         7.8
       </motion.div>
 
-      {/* Can — desktop */}
-      <motion.div
-        className="absolute hidden lg:block pointer-events-none select-none"
-        style={{ right: "3vw", bottom: 0, y: canY, opacity: canOp, zIndex: 1 }}
-        initial={{ opacity: 0, x: 80 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 1.1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Image
-          src="/blunt-can.png"
-          alt="BLUNT can"
-          width={420}
-          height={630}
-          priority
-          style={{
-            height: "clamp(340px, 78vh, 700px)",
-            width: "auto",
-            filter: "drop-shadow(0 0 80px rgba(0,194,255,0.22)) drop-shadow(0 60px 100px rgba(0,0,0,0.7))",
-          }}
-        />
-      </motion.div>
+      {/* 3D Can — desktop */}
+      <Can3D
+        className="absolute hidden lg:block"
+        style={{
+          right: "0vw",
+          top: "0",
+          width: "46vw",
+          height: "100%",
+          zIndex: 1,
+        } as React.CSSProperties}
+      />
 
       {/* Content */}
       <motion.div
