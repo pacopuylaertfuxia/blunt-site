@@ -7,138 +7,152 @@ import {
   ContactShadows,
   Float,
 } from "@react-three/drei";
-import { Suspense, useRef } from "react";
+import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 
-// ─── Proportions of a real 330 ml aluminium can ──────────────────────────────
-//   Real-world:  height 115 mm · body ⌀ 66 mm · neck ⌀ 57 mm
-//   Scene scale: 1 unit ≈ 33 mm  →  body radius 1.0 looks wide in canvas,
-//   so we keep the tighter 0.62 r that fits the hero nicely.
+// ─────────────────────────────────────────────────────────────────────────────
+//  Single LatheGeometry profile — one seamless mesh, no junction artefacts.
+//
+//  Real 330 ml can (Coca-Cola / standard):
+//    total height  115 mm  →  scene 3.45 u  (scale 0.030 u/mm)
+//    body radius    33 mm  →  0.99 u  (we keep 0.62 to fit hero; proportions preserved)
+//    neck radius    28.5 mm →  0.535 u
+//
+//  Points are (radius, y) from BOTTOM → TOP.
+// ─────────────────────────────────────────────────────────────────────────────
 
-const R      = 0.62;   // body radius
-const rNeck  = 0.505;  // neck radius  (≈ 57/66 × R)
-const rBase  = 0.545;  // bottom-dome radius (slightly smaller than body)
-const BODY   = 2.55;   // straight-wall height
-const SEGS   = 128;
+function buildCanProfile(): THREE.Vector2[] {
+  // Helper: quadratic bezier interpolation
+  const bezier = (
+    p0: [number, number],
+    p1: [number, number],
+    p2: [number, number],
+    steps: number
+  ): THREE.Vector2[] => {
+    const pts: THREE.Vector2[] = [];
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      const u = 1 - t;
+      const x = u * u * p0[0] + 2 * u * t * p1[0] + t * t * p2[0];
+      const y = u * u * p0[1] + 2 * u * t * p1[1] + t * t * p2[1];
+      pts.push(new THREE.Vector2(x, y));
+    }
+    return pts;
+  };
 
-// ─── Shared materials ─────────────────────────────────────────────────────────
+  const R     = 0.620;   // body radius
+  const rN    = 0.535;   // neck radius
+  const rBase = 0.490;   // base dome rim
 
-function bodyMat() {
-  return (
-    <meshPhysicalMaterial
-      color="#c0d4e0"
-      metalness={0.92}
-      roughness={0.12}
-      clearcoat={0.7}
-      clearcoatRoughness={0.05}
-      envMapIntensity={1.6}
-    />
-  );
+  const pts: THREE.Vector2[] = [];
+
+  // ── bottom dome (concave inner dome, then outward chime) ──
+  // centre point
+  pts.push(new THREE.Vector2(0.0,   -1.88));
+  // inner dome rising outward
+  pts.push(...bezier([0.0, -1.88], [0.30, -1.90], [rBase, -1.82], 8));
+  // chime curving outward + up to body
+  pts.push(...bezier([rBase, -1.82], [R - 0.01, -1.78], [R, -1.70], 6));
+
+  // ── straight body wall ──
+  pts.push(new THREE.Vector2(R, -1.70));
+  pts.push(new THREE.Vector2(R,  1.42));
+
+  // ── top shoulder (smooth inward curve, the "neck taper") ──
+  pts.push(...bezier([R, 1.42], [R, 1.64], [rN, 1.78], 12));
+
+  // ── neck (short straight section) ──
+  pts.push(new THREE.Vector2(rN, 1.78));
+  pts.push(new THREE.Vector2(rN, 1.88));
+
+  // ── rim bead (tiny outward flare at the very top edge) ──
+  pts.push(new THREE.Vector2(rN + 0.012, 1.90));
+  pts.push(new THREE.Vector2(rN + 0.012, 1.92));
+  pts.push(new THREE.Vector2(rN,          1.94));
+
+  return pts;
 }
 
-function topMat() {
-  return (
-    <meshPhysicalMaterial
-      color="#a8bfcc"
-      metalness={0.96}
-      roughness={0.07}
-      clearcoat={1}
-      clearcoatRoughness={0.03}
-      envMapIntensity={2.0}
-    />
-  );
-}
-
-function ringMat() {
-  return (
-    <meshPhysicalMaterial
-      color="#d8eaf4"
-      metalness={1}
-      roughness={0.03}
-      envMapIntensity={2.5}
-    />
-  );
-}
-
-// ─── Can ─────────────────────────────────────────────────────────────────────
+// ─── Can mesh ────────────────────────────────────────────────────────────────
 
 function CanModel() {
-  const ref = useRef<THREE.Group>(null);
+  const ref     = useRef<THREE.Group>(null);
+  const profile = useMemo(buildCanProfile, []);
 
   useFrame((_, dt) => {
-    if (ref.current) ref.current.rotation.y += dt * 0.30;
+    if (ref.current) ref.current.rotation.y += dt * 0.28;
   });
 
-  const half   = BODY / 2;          // 1.275
-  const topShH = 0.28;              // top shoulder height
-  const botShH = 0.20;              // bottom shoulder height
-  const neckH  = 0.08;              // neck straight
-  const capH   = 0.04;              // cap disc thickness
-
-  // y positions (centre of each piece)
-  const topShY  = half + topShH / 2;
-  const neckY   = half + topShH + neckH / 2;
-  const capY    = half + topShH + neckH + capH / 2;
-  const ringY   = half + topShH + neckH + capH + 0.025;
-
-  const botShY  = -(half + botShH / 2);
-  const baseY   = -(half + botShH + capH / 2);
+  const rN   = 0.535;
+  const topY = 1.94;   // must match last profile point y
 
   return (
     <group ref={ref}>
-      {/* ── Straight body ── */}
+
+      {/* ── One seamless can body ── */}
       <mesh castShadow receiveShadow>
-        <cylinderGeometry args={[R, R, BODY, SEGS, 1, false]} />
-        {bodyMat()}
+        <latheGeometry args={[profile, 128]} />
+        <meshPhysicalMaterial
+          color="#c4d6e2"
+          metalness={0.93}
+          roughness={0.10}
+          clearcoat={0.75}
+          clearcoatRoughness={0.05}
+          envMapIntensity={1.8}
+        />
       </mesh>
 
-      {/* ── Top shoulder taper (smooth cone) ── */}
-      <mesh position={[0, topShY, 0]} castShadow>
-        <cylinderGeometry args={[rNeck, R, topShH, SEGS, 1, false]} />
-        {topMat()}
+      {/* ── Lid (flat disc) ── */}
+      <mesh position={[0, topY, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[rN, 128]} />
+        <meshPhysicalMaterial
+          color="#aabdca"
+          metalness={0.95}
+          roughness={0.08}
+          clearcoat={1}
+          clearcoatRoughness={0.03}
+          envMapIntensity={2.2}
+        />
       </mesh>
 
-      {/* ── Top neck ── */}
-      <mesh position={[0, neckY, 0]}>
-        <cylinderGeometry args={[rNeck, rNeck, neckH, SEGS, 1, false]} />
-        {topMat()}
+      {/* ── Score ring (embossed circle on lid) ── */}
+      <mesh position={[0, topY + 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[rN * 0.44, rN * 0.52, 128]} />
+        <meshPhysicalMaterial
+          color="#8a9daa"
+          metalness={1}
+          roughness={0.18}
+        />
       </mesh>
 
-      {/* ── Top cap ── */}
-      <mesh position={[0, capY, 0]}>
-        <cylinderGeometry args={[rNeck, rNeck, capH, SEGS, 1, false]} />
-        {topMat()}
+      {/* ── Pull-tab ring ── */}
+      <mesh
+        position={[rN * 0.30, topY + 0.028, 0]}
+        rotation={[0.25, 0, 0]}
+      >
+        <torusGeometry args={[rN * 0.175, 0.015, 16, 64]} />
+        <meshPhysicalMaterial
+          color="#d8eaf4"
+          metalness={1}
+          roughness={0.03}
+          envMapIntensity={2.5}
+        />
       </mesh>
 
-      {/* ── Rivet / score line on lid ── */}
-      <mesh position={[0, capY + capH / 2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[rNeck * 0.55, rNeck * 0.65, SEGS]} />
-        <meshPhysicalMaterial color="#8aa0ae" metalness={1} roughness={0.15} />
+      {/* ── Pull-tab lever ── */}
+      <mesh
+        position={[rN * 0.05, topY + 0.018, 0]}
+        rotation={[0.2, 0, 0.15]}
+      >
+        <boxGeometry args={[rN * 0.32, 0.012, rN * 0.55]} />
+        <meshPhysicalMaterial
+          color="#ccdce8"
+          metalness={1}
+          roughness={0.05}
+          envMapIntensity={2.0}
+        />
       </mesh>
 
-      {/* ── Pull ring ── */}
-      <mesh position={[rNeck * 0.28, ringY, 0]} rotation={[0.28, 0, 0]}>
-        <torusGeometry args={[rNeck * 0.18, 0.016, 14, 64]} />
-        {ringMat()}
-      </mesh>
-
-      {/* ── Bottom shoulder taper ── */}
-      <mesh position={[0, botShY, 0]} castShadow>
-        <cylinderGeometry args={[R, rBase, botShH, SEGS, 1, false]} />
-        {topMat()}
-      </mesh>
-
-      {/* ── Bottom cap ── */}
-      <mesh position={[0, baseY, 0]}>
-        <cylinderGeometry args={[rBase, rBase, capH, SEGS, 1, false]} />
-        {topMat()}
-      </mesh>
-
-      {/* ── Bottom face ── */}
-      <mesh position={[0, baseY - capH / 2, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[rBase, SEGS]} />
-        {topMat()}
-      </mesh>
     </group>
   );
 }
@@ -146,17 +160,17 @@ function CanModel() {
 // ─── Mouse-tracked highlight ──────────────────────────────────────────────────
 
 function DynamicLight() {
-  const lightRef = useRef<THREE.PointLight>(null);
+  const ref     = useRef<THREE.PointLight>(null);
   const { pointer } = useThree();
 
   useFrame(() => {
-    if (lightRef.current) {
-      lightRef.current.position.x += (pointer.x * 6 - lightRef.current.position.x) * 0.08;
-      lightRef.current.position.y += (pointer.y * 4 - lightRef.current.position.y) * 0.08;
+    if (ref.current) {
+      ref.current.position.x += (pointer.x * 6 - ref.current.position.x) * 0.08;
+      ref.current.position.y += (pointer.y * 4 - ref.current.position.y) * 0.08;
     }
   });
 
-  return <pointLight ref={lightRef} position={[0, 0, 6]} intensity={2.0} color="#ffffff" />;
+  return <pointLight ref={ref} position={[0, 0, 6]} intensity={2.0} color="#ffffff" />;
 }
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
@@ -164,11 +178,11 @@ function DynamicLight() {
 function Scene() {
   return (
     <>
-      <ambientLight intensity={0.20} />
+      <ambientLight intensity={0.18} />
       <DynamicLight />
-      <pointLight position={[-5, 3, 2]}  intensity={0.8}  color="#00C2FF" />
-      <pointLight position={[5, -3, 2]}  intensity={0.50} color="#7EFFD4" />
-      <pointLight position={[0, -4, -2]} intensity={0.25} color="#ffffff" />
+      <pointLight position={[-5,  3, 2]} intensity={0.80} color="#00C2FF" />
+      <pointLight position={[ 5, -3, 2]} intensity={0.50} color="#7EFFD4" />
+      <pointLight position={[ 0, -4, -2]} intensity={0.20} color="#ffffff" />
 
       <PresentationControls
         global
@@ -184,7 +198,7 @@ function Scene() {
       </PresentationControls>
 
       <ContactShadows
-        position={[0, -3.2, 0]}
+        position={[0, -2.6, 0]}
         opacity={0.40}
         scale={8}
         blur={2.8}

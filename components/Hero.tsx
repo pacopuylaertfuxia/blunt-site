@@ -104,7 +104,7 @@ export default function Hero() {
         {/* Divider */}
         <motion.div variants={line} className="flex items-center gap-4 mb-8">
           <div className="h-px flex-1 max-w-[200px]" style={{ background: "var(--border2)" }}/>
-          <span className="font-display text-xs tracking-[0.2em]" style={{ color: "var(--c30)" }}>2024 — CONFIDENTIAL</span>
+          <span className="font-display text-xs tracking-[0.2em]" style={{ color: "var(--c30)" }}>2026 — CONFIDENTIAL</span>
         </motion.div>
 
         {/* Subtitle */}

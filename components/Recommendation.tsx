@@ -104,7 +104,7 @@ export default function Recommendation() {
             <div className="font-display" style={{ fontSize:"clamp(1.5rem,4vw,2.5rem)", color:"rgba(0,12,24,0.88)", letterSpacing:"0.02em" }}>
               Be first in Europe.
             </div>
-            <p className="text-sm font-light mt-1" style={{ color:"rgba(0,12,24,0.5)" }}>Copenhagen launch · Early 2025</p>
+            <p className="text-sm font-light mt-1" style={{ color:"rgba(0,12,24,0.5)" }}>Copenhagen launch · 2026</p>
           </div>
           <a
             href="mailto:hello@blunt.co?subject=BLUNT Waitlist"
