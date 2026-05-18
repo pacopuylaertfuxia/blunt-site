@@ -1,6 +1,7 @@
+import CustomCursor from "@/components/CustomCursor";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import Features from "@/components/Features";
+import Ticker from "@/components/Ticker";
 import SocialProof from "@/components/SocialProof";
 import Competition from "@/components/Competition";
 import Scores from "@/components/Scores";
@@ -12,18 +13,21 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main>
-      <Navbar />
-      <Hero />
-      <Features />
-      <SocialProof />
-      <Competition />
-      <Scores />
-      <Virality />
-      <Pricing />
-      <FAQ />
-      <Recommendation />
-      <Footer />
-    </main>
+    <>
+      <CustomCursor />
+      <main>
+        <Navbar />
+        <Hero />
+        <Ticker />
+        <SocialProof />
+        <Competition />
+        <Scores />
+        <Virality />
+        <Pricing />
+        <FAQ />
+        <Recommendation />
+        <Footer />
+      </main>
+    </>
   );
 }

@@ -3,31 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --bg:       #060A10;
-  --bg2:      #0C1219;
-  --bg3:      #131B25;
-  --cyan:     #00C2FF;
-  --cyan-dim: rgba(0,194,255,0.08);
-  --cyan-mid: rgba(0,194,255,0.22);
-  --mint:     #7EFFD4;
-  --cream:    #E8F0F5;
-  --cream60:  rgba(232,240,245,0.6);
-  --cream30:  rgba(232,240,245,0.3);
-  --border:   rgba(255,255,255,0.07);
-  --border2:  rgba(255,255,255,0.11);
+  --bg:      #060A10;
+  --bg2:     #0C1219;
+  --bg3:     #131B25;
+  --cyan:    #00C2FF;
+  --mint:    #7EFFD4;
+  --cream:   #E8F0F5;
+  --warm:    #F0EDE8;
+  --ink:     #08080C;
+  --c60:     rgba(232,240,245,0.6);
+  --c30:     rgba(232,240,245,0.3);
+  --c10:     rgba(232,240,245,0.1);
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
@@ -37,61 +30,28 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  cursor: none;
 }
 
-::selection {
-  background: var(--cyan-mid);
-  color: var(--cream);
+/* Grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+  opacity: 0.038;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg2);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(0,194,255,0.3);
-  border-radius: 2px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,194,255,0.5);
+::selection { background: var(--cyan); color: var(--ink); }
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 @layer utilities {
-  .font-display {
-    font-family: var(--font-display), 'Bebas Neue', sans-serif;
-  }
-  .text-cyan {
-    color: var(--cyan);
-  }
-  .text-mint {
-    color: var(--mint);
-  }
-  .text-cream {
-    color: var(--cream);
-  }
-  .text-cream60 {
-    color: var(--cream60);
-  }
-  .text-cream30 {
-    color: var(--cream30);
-  }
-  .bg-blunt {
-    background: var(--bg);
-  }
-  .bg-blunt-2 {
-    background: var(--bg2);
-  }
-  .bg-blunt-3 {
-    background: var(--bg3);
-  }
-  .border-blunt {
-    border-color: var(--border);
-  }
-  .border-blunt-2 {
-    border-color: var(--border2);
-  }
+  .font-display { font-family: var(--font-display), 'Bebas Neue', sans-serif; }
 }

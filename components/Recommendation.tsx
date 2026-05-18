@@ -1,156 +1,122 @@
 "use client";
-
-import { motion } from "framer-motion";
-
-import ScrollReveal from "./ScrollReveal";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 const cards = [
   {
+    num: "A",
     label: "The Angle",
-    body: 'Own <strong>"creatine for people who don\'t take supplements."</strong> Not gym. Not sport. Not biohacking. Everyday performance for people who care how they feel at 3pm. The cognitive / afternoon energy angle sidesteps the bodybuilder association entirely.',
-    delay: 0,
+    body: 'Own "creatine for people who don\'t take supplements." Not gym. Not sport. The cognitive / afternoon energy angle sidesteps the bodybuilder association entirely.',
   },
   {
+    num: "B",
     label: "First 30 Days",
-    body: "<strong>Lock CreaBev® or equivalent with an exclusivity clause.</strong> Design the can before you make the can — the visual identity IS the product validation. Launch a waitlist targeting Copenhagen padel clubs and cycling communities.",
-    delay: 0.07,
+    body: "Lock CreaBev® with exclusivity. Design the can before you make the can — the visual identity IS the product validation. Waitlist: Copenhagen padel clubs and cycling communities.",
   },
   {
-    label: "Channel to Study",
-    body: "<strong>Momentous</strong> — US brand that crossed from elite sport into mainstream with exactly this positioning shift. Their content, ambassador strategy, and DTC-to-retail sequencing is your playbook. Athletic Brewing for cultural proof of concept.",
-    delay: 0.14,
+    num: "C",
+    label: "Playbook",
+    body: "Momentous — US brand that crossed from elite sport into mainstream. Athletic Brewing for cultural proof. Their DTC-to-retail sequencing is your roadmap.",
   },
   {
+    num: "D",
     label: "Bottom Line",
-    body: "The concept is sound, the timing is right, the positioning is differentiated. <strong>The risk isn't the idea — it's execution speed</strong> and staying funded through the 18-month powder → can transition. If the can looks as good as Olipop and the community is tight before retail, this is a real brand.",
-    delay: 0.21,
+    body: "The risk isn't the idea — it's execution speed and staying funded through the 18-month powder → can transition. If the can looks as good as Olipop and community is tight before retail, this is a real brand.",
   },
 ];
 
 export default function Recommendation() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const goX = useTransform(scrollYProgress, [0, 0.4], ["-8%", "0%"]);
+
   return (
-    <section
-      id="recommendation"
-      className="py-24 px-6 lg:px-10"
-      style={{ background: "#00C2FF" }}
-    >
-      <div className="max-w-6xl mx-auto">
-        <ScrollReveal>
-          <div
-            className="flex items-center gap-3 mb-3"
-          >
-            <span
-              className="inline-block w-5 h-px"
-              style={{ background: "rgba(0,12,24,0.35)" }}
-            />
-            <span
-              className="font-display text-xs tracking-[0.3em]"
-              style={{ color: "rgba(0,12,24,0.55)" }}
-            >
-              07 — Recommendation
-            </span>
-          </div>
-          <h2
-            className="font-display leading-[0.95] tracking-[0.03em] mb-8"
-            style={{
-              fontSize: "clamp(2rem, 5vw, 3.5rem)",
-              color: "rgba(0,12,24,0.7)",
-            }}
-          >
-            Verdict
-          </h2>
-        </ScrollReveal>
+    <section ref={ref} id="recommendation" className="overflow-hidden" style={{ background: "#00C2FF" }}>
 
-        <ScrollReveal delay={0.05}>
-          <div
-            className="font-display leading-[0.88] mb-12"
-            style={{
-              fontSize: "clamp(4rem, 10vw, 8rem)",
-              color: "#001824",
-              letterSpacing: "0.01em",
-            }}
-          >
-            GO —<br />
-            Copenhagen<br />
-            First.
-          </div>
-        </ScrollReveal>
-
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 gap-px"
+      {/* GO — full-bleed */}
+      <div className="relative overflow-hidden" style={{ borderBottom:"2px solid rgba(0,12,24,0.15)" }}>
+        <motion.div
+          className="font-display leading-[0.82] select-none"
           style={{
-            background: "rgba(0,12,24,0.18)",
-            border: "1px solid rgba(0,12,24,0.18)",
+            fontSize: "clamp(10rem, 35vw, 28rem)",
+            color: "rgba(0,12,24,0.9)",
+            letterSpacing: "-0.02em",
+            x: goX,
+            paddingLeft: "0.1em",
           }}
+          initial={{ opacity:0 }}
+          whileInView={{ opacity:1 }}
+          viewport={{ once:true }}
+          transition={{ duration:1, ease:[0.22,1,0.36,1] }}
         >
-          {cards.map((c) => (
+          GO
+        </motion.div>
+
+        {/* Verdict tag */}
+        <motion.div
+          className="absolute bottom-8 right-6 lg:right-10 text-right"
+          initial={{ opacity:0, x:20 }}
+          whileInView={{ opacity:1, x:0 }}
+          viewport={{ once:true }}
+          transition={{ duration:0.7, delay:0.4 }}
+        >
+          <div className="font-display text-xs tracking-[0.3em] mb-1" style={{ color:"rgba(0,12,24,0.45)" }}>07 — Recommendation</div>
+          <div className="font-display" style={{ fontSize:"clamp(1.5rem,4vw,3rem)", color:"rgba(0,12,24,0.85)", letterSpacing:"0.04em" }}>
+            Copenhagen First.
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Cards */}
+      <div className="px-6 lg:px-10 pt-12 pb-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ background:"rgba(0,12,24,0.18)" }}>
+          {cards.map((c, i) => (
             <motion.div
-              key={c.label}
-              className="p-8 transition-colors duration-200"
-              style={{ background: "rgba(0,12,24,0.1)" }}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.55, delay: c.delay, ease: [0.25, 0.1, 0.25, 1] }}
-              whileHover={{ backgroundColor: "rgba(0,12,24,0.2)" }}
+              key={c.num}
+              className="p-8"
+              style={{ background:"rgba(0,12,24,0.08)" }}
+              initial={{ opacity:0, y:20 }}
+              whileInView={{ opacity:1, y:0 }}
+              viewport={{ once:true }}
+              transition={{ duration:0.5, delay:i*0.07, ease:[0.22,1,0.36,1] }}
+              onMouseEnter={e => (e.currentTarget.style.background="rgba(0,12,24,0.18)")}
+              onMouseLeave={e => (e.currentTarget.style.background="rgba(0,12,24,0.08)")}
             >
-              <div
-                className="font-display text-xs tracking-[0.25em] mb-3"
-                style={{ color: "rgba(0,12,24,0.5)" }}
-              >
-                {c.label}
+              <div className="flex items-center gap-3 mb-3">
+                <span className="font-display text-xs" style={{ color:"rgba(0,12,24,0.4)" }}>{c.num}</span>
+                <span className="font-display text-xs tracking-[0.2em]" style={{ color:"rgba(0,12,24,0.5)" }}>{c.label}</span>
               </div>
-              <p
-                className="text-sm font-light leading-relaxed"
-                style={{ color: "rgba(0,12,24,0.8)" }}
-                dangerouslySetInnerHTML={{
-                  __html: c.body.replace(
-                    /<strong>/g,
-                    '<strong style="color:#001824;font-weight:500">'
-                  ),
-                }}
-              />
+              <p className="text-sm font-light leading-relaxed" style={{ color:"rgba(0,12,24,0.75)" }}>{c.body}</p>
             </motion.div>
           ))}
         </div>
 
         {/* Waitlist CTA */}
-        <ScrollReveal delay={0.3}>
-          <div className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <div>
-              <div
-                className="font-display text-2xl lg:text-3xl mb-1"
-                style={{ color: "#001824", letterSpacing: "0.04em" }}
-              >
-                Be the first to know.
-              </div>
-              <p
-                className="text-sm font-light"
-                style={{ color: "rgba(0,12,24,0.6)" }}
-              >
-                Copenhagen launch · Early 2025
-              </p>
+        <motion.div
+          className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 py-8"
+          style={{ borderTop:"1px solid rgba(0,12,24,0.2)" }}
+          initial={{ opacity:0 }}
+          whileInView={{ opacity:1 }}
+          viewport={{ once:true }}
+          transition={{ duration:0.6, delay:0.3 }}
+        >
+          <div>
+            <div className="font-display" style={{ fontSize:"clamp(1.5rem,4vw,2.5rem)", color:"rgba(0,12,24,0.88)", letterSpacing:"0.02em" }}>
+              Be first in Europe.
             </div>
-            <a
-              href="mailto:hello@blunt.co?subject=BLUNT Waitlist"
-              className="flex-shrink-0 font-display text-sm tracking-[0.15em] px-8 py-4 transition-all duration-200"
-              style={{
-                background: "#001824",
-                color: "#00C2FF",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#060A10";
-                e.currentTarget.style.color = "#7EFFD4";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#001824";
-                e.currentTarget.style.color = "#00C2FF";
-              }}
-            >
-              Join the Waitlist →
-            </a>
+            <p className="text-sm font-light mt-1" style={{ color:"rgba(0,12,24,0.5)" }}>Copenhagen launch · Early 2025</p>
           </div>
-        </ScrollReveal>
+          <a
+            href="mailto:hello@blunt.co?subject=BLUNT Waitlist"
+            data-cursor
+            className="flex-shrink-0 font-display text-sm tracking-[0.15em] px-8 py-4 transition-all duration-200"
+            style={{ background:"rgba(0,12,24,0.88)", color:"#00C2FF" }}
+            onMouseEnter={e => { e.currentTarget.style.background="#060A10"; e.currentTarget.style.color="#7EFFD4"; }}
+            onMouseLeave={e => { e.currentTarget.style.background="rgba(0,12,24,0.88)"; e.currentTarget.style.color="#00C2FF"; }}
+          >
+            Join the Waitlist →
+          </a>
+        </motion.div>
       </div>
     </section>
   );
